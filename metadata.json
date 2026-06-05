@@ -1,0 +1,6 @@
+{
+  "name": "Planta",
+  "description": "Editor visual e colaborativo de plantas de planejamento e projetos como o FIB16.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planta — Editor Visual Co-coop</title>
+    <!-- Tabler Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  </head>
+  <body>
+    <h2 class="sr-only">Planta v7 — menu com Caixa de Ferramentas e Outros Planos, incluindo planta-modelo do FIB16</h2>
+
+    <div class="app" id="app">
+      <div class="topbar">
+        <div class="logo-dot"><i class="ti ti-topology-star-3" aria-hidden="true"></i></div>
+        <span class="proj-name" id="projName">Nova planta</span>
+        <div class="tb-r">
+          <button class="tb-btn" id="clearAllBtn"><i class="ti ti-trash" aria-hidden="true"></i>Limpar</button>
+          <button class="tb-btn" id="historyBtn"><i class="ti ti-history" aria-hidden="true"></i>Histórico</button>
+          <button class="tb-pri" id="publishBtn">Publicar planta</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <div class="sidebar" id="sb">
+          <div class="main-tabs">
+            <button class="main-tab on" id="tabTools"><i class="ti ti-tool" aria-hidden="true"></i>Ferramentas</button>
+            <button class="main-tab" id="tabPlans"><i class="ti ti-layout-grid" aria-hidden="true"></i>Outros Planos</button>
+          </div>
+
+          <div class="tab-pane" id="paneTools">
+            <div class="sb-top">
+              <div class="search-wrap">
+                <i class="ti ti-search" aria-hidden="true"></i>
+                <input class="sb-search" id="sbSearch" placeholder="Buscar cartas..." autocomplete="off">
+              </div>
+              <div class="suggest" id="suggest"></div>
+              <div class="add-row">
+                <button class="add-btn" id="createCardBtn"><i class="ti ti-plus" aria-hidden="true"></i>Criar carta</button>
+                <button class="add-btn" id="openImportBtn"><i class="ti ti-upload" aria-hidden="true"></i>Importar</button>
+              </div>
+            </div>
+            <div id="catContainer"></div>
+          </div>
+
+          <div class="tab-pane hidden" id="panePlans">
+            <p class="plans-intro">Plantas-modelo já estruturadas. Carregue uma e preencha as cartas que já vêm prontas no canvas.</p>
+            <div id="plansContainer"></div>
+          </div>
+        </div>
+
+        <div class="canvas-area" id="canvasArea">
+          <div class="canvas-bg"></div>
+          <div class="conn-mode-bar" id="connBar">
+            <i class="ti ti-plug" style="font-size:13px" aria-hidden="true"></i>
+            Modo conexão — clique em outra carta para ligar
+            <span style="cursor:pointer; color:#7F77DD; font-weight:500;" id="cancelConnBtn">Cancelar</span>
+          </div>
+          <div class="canvas-scroll" id="canvasScroll">
+            <div class="canvas-inner" id="ci">
+              <svg class="conn-svg" id="connSvg">
+                <defs>
+                  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                  <marker id="arrP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <div class="hint" id="hint">
+            <i class="ti ti-drag-drop" aria-hidden="true"></i>
+            <p>Arraste cartas da <strong>Caixa de Ferramentas</strong> para montar a planta,<br>ou abra <strong>Outros Planos</strong> e carregue um modelo pronto.</p>
+          </div>
+        </div>
+
+        <div class="rp open" id="rp">
+          <div class="rp-toggle" id="rpToggleBtn"><i class="ti ti-chevron-left" aria-hidden="true"></i></div>
+          <div class="rp-inner">
+            <div class="rp-sec">
+              <p class="rp-sec-title"><i class="ti ti-info-circle" style="font-size:12px" aria-hidden="true"></i>Sobre o projeto</p>
+              <div class="rp-field"><span class="rp-label">Título</span><p class="rp-val" style="font-weight:500; font-size:13px;" id="rpTitle">Nova planta</p></div>
+              <div class="rp-field" style="margin-bottom:0"><span class="rp-label">Descrição</span><p class="rp-val" id="rpDesc">Comece arrastando cartas ou carregue um plano-modelo.</p></div>
+            </div>
+            <div class="rp-sec">
+              <p class="rp-sec-title"><i class="ti ti-building-community" style="font-size:12px" aria-hidden="true"></i>Organizações</p>
+              <div id="rpOrgs">
+                <div class="org-row"><div class="av" style="width:26px; height:26px; background:#E1F5EE; color:#085041;">IC</div><div><p style="font-size:12px; font-weight:500; color:var(--color-text-primary);">Instituto Cidades</p><p style="font-size:10px; color:var(--color-text-tertiary);">Orquestrador</p></div></div>
+              </div>
+              <span class="add-link" id="addOrgBtn"><i class="ti ti-plus" style="font-size:11px" aria-hidden="true"></i>Adicionar organização</span>
+            </div>
+            <div class="rp-sec" style="border-bottom:none;">
+              <p class="rp-sec-title"><i class="ti ti-activity" style="font-size:12px" aria-hidden="true"></i>Histórico de atividades</p>
+              <div id="actFeed">
+                <div class="act-item"><div class="act-dot" style="background:#888780"></div><div><p class="act-txt">Planta criada</p><p class="act-time">01 jun, 09h00</p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btm">
+        <span class="btm-item"><i class="ti ti-cards" aria-hidden="true"></i><span id="cCount">0 cartas</span></span>
+        <span class="btm-item"><i class="ti ti-link" aria-hidden="true"></i><span id="cnCount">0 conexões</span></span>
+        <div class="zm">
+          <button class="zm-btn" id="zoomOutBtn">−</button>
+          <span class="zm-val" id="zmVal">100%</span>
+          <button class="zm-btn" id="zoomInBtn">+</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <div class="ov" id="ov" style="display:none; position:absolute;">
+        <div class="modal">
+          <div class="modal-head">
+            <div class="m-head-top">
+              <div class="m-icon" id="mIcon"><i class="ti ti-cards" aria-hidden="true"></i></div>
+              <input class="m-name-input" id="mName" placeholder="Nome da carta">
+            </div>
+            <p class="m-sub" id="mSub"></p>
+            <select class="m-cat-sel" id="mCat" style="display:none"></select>
+          </div>
+          <div class="modal-body" id="mBody"></div>
+          <div class="modal-foot">
+            <button class="m-s" id="closeModalBtn">Cancelar</button>
+            <button class="m-p" id="mConfirm">Salvar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ov" id="infoOv" style="display:none; position:absolute;">
+        <div class="info-modal">
+          <div class="info-head">
+            <div class="info-icon" id="infoIcon"></div>
+            <div><div class="info-name" id="infoName"></div><div class="info-cat" id="infoCat"></div></div>
+          </div>
+          <div class="info-body">
+            <div class="info-block"><div class="info-block-title"><i class="ti ti-bulb" style="font-size:12px" aria-hidden="true"></i>O QUE É</div><div class="info-block-text" id="infoWhat"></div></div>
+            <div class="info-block"><div class="info-block-title"><i class="ti ti-arrow-guide" style="font-size:12px" aria-hidden="true"></i>COMO USAR</div><div class="info-block-text" id="infoHow"></div></div>
+            <div class="info-block"><div class="info-block-title"><i class="ti ti-forms" style="font-size:12px" aria-hidden="true"></i>CAMPOS</div><div class="info-fields" id="infoFields"></div></div>
+          </div>
+          <div class="info-foot">
+            <button class="info-s" id="closeInfoBtn">Fechar</button>
+            <button class="info-p" id="infoUse"><i class="ti ti-plus" style="font-size:13px" aria-hidden="true"></i>Usar esta carta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ponto de Entrada do JavaScript Modularizado -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
